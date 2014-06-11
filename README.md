@@ -1,7 +1,7 @@
 jQuery Soap
 ===========
 **file:** jquery.soap.js  
-**version:** 1.3.7
+**version:** 1.3.8
 
 jQuery plugin for communicating with a web service using SOAP.
 --------------------------------------------------------------
@@ -122,7 +122,7 @@ old | new | reason
 --- | --- | ---
 napespaceUrl | namespaceURL | to capitalize URL is quite common
 params | data | $.ajax uses data too, more consistent
-request | beforeSend | $.ajax uses data too, more consistent
+request | beforeSend | $.ajax uses beforeSend too, more consistent
 
 The old names are mapped to the new names and will be deprecated at version 2.0.0 (that might take years, or decades). A warning is printed to the console when you use an old name.
 
@@ -311,6 +311,7 @@ Version numbers are [semver](http://semver.org/) compatible from version 1.0.0 a
 
 Version | Date | Changes
 --- | --- | ---
+1.3.8 | 2014-04-14 | fix for #45: handle string objects in json2soap: thanx [PALLEAU Michel](https://github.com/mic006)
 1.3.7 | 2014-02-27 | fix for #40: removed trailing slash on SOAP1.2 namespaceURL: thanx [AlexandreFournier](https://github.com/AlexandreFournier)
 1.3.6 | 2014-02-26 | fix for issue #38: specifying only namespaceURL works too
 1.3.5 | 2014-02-20 | bugfix for #36: correct handling of setting null values using SOAPObject

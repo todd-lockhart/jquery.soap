@@ -1,6 +1,6 @@
 /*==========================
 jquery.soap.js  http://plugins.jquery.com/soap/ or https://github.com/doedje/jquery.soap
-version: 1.3.7
+version: 1.3.8
 
 jQuery plugin for communicating with a web service using SOAP.
 
@@ -31,7 +31,7 @@ For information about how to use jQuery.soap, authors, changelog, the latest ver
 Visit: https://github.com/doedje/jquery.soap
 
 Documentation about THIS version is found here:
-https://github.com/doedje/jquery.soap/blob/1.3.7/README.md
+https://github.com/doedje/jquery.soap/blob/1.3.8/README.md
 
 ======================*/
 
@@ -77,7 +77,7 @@ https://github.com/doedje/jquery.soap/blob/1.3.7/README.md
 			var soapEnvelope = new SOAPEnvelope(soapObject);
 			// Additional attributes and namespaces for the Envelope
 			if (config.envAttributes) {
-				for (var i in config.envAttributes) {
+				for (var i = 0; i < config.envAttributes.length; i++) {
 					soapEnvelope.addAttribute(i, config.envAttributes[i]);
 				}
 			}
@@ -181,7 +181,6 @@ https://github.com/doedje/jquery.soap/blob/1.3.7/README.md
 		toString: function() {
 			var soapEnv = new SOAPObject(this.prefix + ':Envelope');
 			//Add attributes
-			// this should be ok in IE8
 			for (var name in this.attributes) {
 				soapEnv.attr(name, this.attributes[name]);
 			}
@@ -229,7 +228,16 @@ https://github.com/doedje/jquery.soap/blob/1.3.7/README.md
 				dataType: "xml",
 				processData: false,
 				data: this.toString(),
-				contentType: contentType + "; charset=UTF-8"
+				contentType: contentType + "; charset=UTF-8",
+				xhrFields: {
+				  onprogress: function(e) {
+				    if (e.lengthComputable) {
+				      log("jquery.soap - progress:", (e.loaded / e.total * 100));
+				    } else {
+				      log("jquery.soap - progress:","Length not computable.");
+				    }
+				  }
+				}
 			});
 		}
 	};
@@ -315,7 +323,6 @@ https://github.com/doedje/jquery.soap/blob/1.3.7/README.md
 					out.push(' xmlns:' + name + '="' + this.ns[name] + '"');
 			}
 			//Node Attributes
-			// this should be ok in IE8
 			for (var attr in this.attributes) {
 					out.push(' ' + attr + '="' + this.attributes[attr] + '"');
 			}
@@ -420,13 +427,17 @@ https://github.com/doedje/jquery.soap/blob/1.3.7/README.md
 				// added by DT - check if object is in fact an Array and treat accordingly
 				if(params.constructor.toString().indexOf("Array") > -1) { // type is array
 					// soapObject = parentNode;
-					for(var x = 0; x < params.length; x++) {
+					for(var x in params) {
 						childObject = this.json2soap(name, params[x], prefix, parentNode);
 						parentNode.appendChild(childObject);
 					}
+				} else if (params.constructor.toString().indexOf("String") > -1) { // type is string
+					// handle String objects as string primitive value
+					soapObject = new SOAPObject(prefix+name);
+					soapObject.val(''+params); // the ''+ is added to fix issues with falsey values.
 				} else {
 					soapObject = new SOAPObject(prefix+name);
-					for(var y = 0; y < params.length; y++) {
+					for(var y in params) {
 						childObject = this.json2soap(y, params[y], prefix, soapObject);
 						if (childObject) {
 							soapObject.appendChild(childObject);
@@ -518,7 +529,6 @@ https://github.com/doedje/jquery.soap/blob/1.3.7/README.md
 				request: 'beforeSend',
 				params: 'data'
 			};
-			// this should be ok in IE8
 			for (var oldParam in deprecated) {
 				var newParam = deprecated[oldParam];
 				if (!config[newParam] && !!config[oldParam]) {
